@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body { font-family: 'Droid Serif'; }
+        h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz';
+            font-weight: normal;
+        }
+        .column:first-of-type {float:left}
+        .column:last-of-type {float:right}
+
+        .split-50 .column:first-of-type {width: 50%}
+        .split-50 .column:last-of-type {width: 50%}
+        .gray{color: darkgray}
+        .contain{background-size:     contain;}
+        .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Octotreat
+
+---
+class: split-50, middle
+
+.column[
+# Joe
+.gray[@telefonkabine]
+
+.gray[github.com/johannesE]
+]
+.column.right[
+# Raffi
+]
+
+---
+class: center, middle
+
+background-image: url(./octopus_with_gift.png)
+
+---
+class: center, middle, contain
+
+background-image: url(./screenshot_how_it_works.png)
+
+---
+# SimpleForm
+``` slim
+.field
+  = label f, :password
+  = password_input f, :password
+  = error_tag f, :password
+```
+
+``` slim
+= form_for @changeset, @action, fn f ->
+  = input f, :amount, as: :currency, placeholder: "5.00"
+  = input f, :valid_until
+  = input f, :email
+  = input f, :password
+```
+
+---
+```elixir
+ def input(form, field, opts \\ []) do
+    type = opts[:as] || Phoenix.HTML.Form.input_type(form, field)
+
+    wrapper_opts = [class: "form-group row #{state_class(form, field)} #{type_opts(type)}"]
+    label_opts   = [class: "col-2 col-form-label"]
+    input_opts   = [class: "form-control", placeholder: opts[:placeholder]]
+
+    validations = Phoenix.HTML.Form.input_validations(form, field)
+    input_opts  = Keyword.merge(validations, input_opts)
+
+    content_tag :div, wrapper_opts do
+      label = label(form, field, humanize(field), label_opts)
+      input_div = content_tag :div, [class: "col-10"] do
+        tags  = additional_tags_for_type(type)
+        input = input(type, form, field, input_opts)
+        error = Octotreat.ErrorHelpers.error_tag(form, field)
+        [tags, input, error || ""]
+      end
+      [label, input_div]
+    end
+ end
+```
+---
+```elixir
+defp type_opts(:currency), do: "input-icon"
+defp type_opts(_), do: ""
+
+defp additional_tags_for_type(:currency) do
+  text_to_html("$", [wrapper_tag: :i])
+end
+defp additional_tags_for_type(_), do: ""
+```
+``` elixir
+# clauses for custom inputs.
+defp input(:currency, form, field, input_opts) do
+  apply(Phoenix.HTML.Form, :text_input, [form, field, input_opts])
+end
+
+defp input(type, form, field, input_opts) do
+  apply(Phoenix.HTML.Form, type, [form, field, input_opts])
+end
+```
+---
+.contain[![](./fields.png)]
+```html
+<div class="form-group row  input-icon">
+  <label class="col-2 col-form-label" for="treat_amount">Amount</label>
+  <div class="col-10">
+    <i>$</i>
+    <input class="form-control" id="treat_amount" name="treat[amount]" placeholder="5.00" required="required" type="text">
+  </div>
+</div>
+```
+
+---
+
+# Deployment
+```elixir
+APP="octotreat"
+
+BUILD_HOST="octotreat.com"
+BUILD_USER="builder"
+BUILD_AT="/tmp/edeliver/octotreat/builds"
+RELEASE_DIR="/tmp/edeliver/octotreat/builds/_build/prod/rel/octotreat"
+
+PRODUCTION_HOSTS="octotreat.com"
+PRODUCTION_USER="octotreat"
+DELIVER_TO="/home/octotreat/web/"
+
+# For *Phoenix* projects, symlink prod.secret.exs to our tmp source
+pre_erlang_get_and_update_deps() {
+  local _prod_secret_path="/home/builder/prod.secret.exs"
+  if [ "$TARGET_MIX_ENV" = "prod" ]; then
+    __sync_remote "
+      ln -sfn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'
+    "
+  fi
+}
+```
+.gray[.deliver/config]
+
+---
+
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create();
+</script>
+</body>
+</html>
