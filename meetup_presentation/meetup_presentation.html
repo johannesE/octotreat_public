@@ -42,7 +42,20 @@ class: split-50, middle
 .column.right[
 # Raffi
 ]
+---
+class: center, middle
 
+background-image: url(./octopus_with_gift.png)
+
+---
+class: middle
+
+```elixir
+issues
+|> Enum.map(fn(issue) -> Task.async(IssuesHelper, :create_comment, [conn, project.name, issue, client]) end)
+|> Enum.map(fn(task)  -> Task.await(task) end)
+$>❤️
+```
 ---
 class: center, middle
 
