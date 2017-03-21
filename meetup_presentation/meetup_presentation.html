@@ -30,6 +30,10 @@ class: center, middle
 
 # Octotreat
 
+
+
+
+
 ---
 class: split-50, middle
 
@@ -40,12 +44,15 @@ class: split-50, middle
 .gray[github.com/johannesE]
 ]
 .column.right[
-# Raffi
-]
----
-class: center, middle
+# Raffael
+.gray[@RaffaelKrebs]
 
-background-image: url(./octopus_with_gift.png)
+.gray[github.com/kreba]
+]
+
+
+
+
 
 ---
 class: middle
@@ -56,18 +63,31 @@ issues
 |> Enum.map(fn(task)  -> Task.await(task) end)
 $>❤️
 ```
+
+
+
+
+
 ---
 class: center, middle
 
 background-image: url(./octopus_with_gift.png)
+
+
+
+
 
 ---
 class: center, middle, contain
 
 background-image: url(./screenshot_how_it_works.png)
 
+
+
+
+
 ---
-# SimpleForm
+# Simple Forms
 ``` slim
 .field
   = label f, :password
@@ -82,6 +102,10 @@ background-image: url(./screenshot_how_it_works.png)
   = input f, :email
   = input f, :password
 ```
+
+
+
+
 
 ---
 ```elixir
@@ -107,6 +131,11 @@ background-image: url(./screenshot_how_it_works.png)
     end
  end
 ```
+
+
+
+
+
 ---
 ```elixir
 defp type_opts(:currency), do: "input-icon"
@@ -127,6 +156,11 @@ defp input(type, form, field, input_opts) do
   apply(Phoenix.HTML.Form, type, [form, field, input_opts])
 end
 ```
+
+
+
+
+
 ---
 .contain[![](./fields.png)]
 ```html
@@ -139,10 +173,13 @@ end
 </div>
 ```
 
----
 
+
+
+
+---
 # Deployment
-```elixir
+```bash
 APP="octotreat"
 
 BUILD_HOST="octotreat.com"
@@ -166,7 +203,235 @@ pre_erlang_get_and_update_deps() {
 ```
 .gray[.deliver/config]
 
+
+
+
+
 ---
+# Server setup with Ansible
+
+ansible playbook (YAML file)
+```yml
+---
+- play
+- play
+- play
+- play
+```
+
+host definitions (plain file)
+```bash
+[octotreat-web]
+octotreat.com
+
+[octotreat-build]
+octotreat.com
+```
+
+
+
+
+
+---
+# Playfully setting up the buildserver
+```yml
+---
+- hosts: octotreat-build
+  remote_user: ansible
+  become_user: root
+  become: true
+
+  vars:
+    users:
+    - key: "ssh-rsa AAAAB3NzaC1yc2EAAABAQC6[...]19zck5vtojUISiFQh== Joe"
+    - key: "ssh-rsa AAAAB3NzaC1yc2EAQEA6ZKG[...]wQgW4GpLk6/iNW7oQ== Raffael"
+
+  tasks:
+  - name: ensure git is installed
+    apt: name=git
+
+  - name: Allow remote access to the builder user for developers
+    authorized_key:
+      user: builder
+      key: "{{item.key}}"
+    with_items: "{{users}}"
+
+  - name: install erlang
+    apt: name={{item}}
+    with_items:
+    - esl-erlang
+    - elixir
+```
+.gray[buildserver.yml]
+
+
+
+
+
+---
+# Factories
+
+Build up example data for testing
+
+Into the database for integration tests
+
+In-memory for fast tests
+
+Complex object trees
+
+
+---
+# Factories – the easy way
+
+```elixir
+defmodule Octotreat.Factory do
+
+  def build(:project) do
+    nr = System.unique_integer()
+
+    %Octotreat.Project{
+      github_id: "testproject#{nr}",
+      url: "https://api.github.com/repos/owner/testproject#{nr}"
+    }
+  end
+
+  # Convenience API
+
+  def build(factory_name, attributes) do
+    factroy_name |> build |> struct(attributes)
+  end
+
+  def insert!(factory_name, attributes \\ []) do
+    Repo.insert! build(factory_name, attributes)
+  end
+
+end
+```
+.gray[test/support/factory.ex]
+
+
+
+
+
+---
+# Factories – complex object trees
+
+```elixir
+def build(:project_with_issues) do
+  build :project, issues: [
+    build(:issue, nr: 1),
+    build(:issue, nr: 2),
+    build(:issue, nr: 3),
+  ]
+end
+
+
+
+
+
+
+
+
+def build(:issue) do
+  nr = System.unique_integer()
+
+  %Octotreat.Issue{
+    url: "https://api.github.com/repos/owner/testproject/issues/#{nr}",
+    status: "open"
+  }
+end
+```
+
+
+
+
+
+---
+# Factories – coherent data for debugging?
+
+```elixir
+def build(:project_with_issues) do
+  project = build :project
+
+  more_attributes = [
+    issues: [
+      build(:issue, project: project, nr: 1),
+      build(:issue, project: project, nr: 2),
+      build(:issue, project: project, nr: 3),
+    ]
+  ]
+
+  project |> struct(more_attributes)
+end
+
+
+def build(:issue) do
+  nr = System.unique_integer()
+
+  %Octotreat.Issue{
+    url: "https://api.github.com/repos/owner/testproject/issues/#{nr}",
+    status: "open"
+  }
+end
+```
+
+
+
+
+
+---
+# Factories – hmmm
+
+```elixir
+def build(factory_name, attributes \\ [])
+
+def build(:project, attributes) do
+  nr    = attributes[:nr]    || System.unique_integer()
+  owner = attributes[:owner] || build(:user)
+
+  %Octotreat.Project{
+    owner: owner,
+    github_id: "testproject#{nr}",
+    url: "https://api.github.com/repos/#{owner.github_id}/testproject#{nr}"
+  } |> struct(attributes)
+end
+
+def build(:issue, attributes) do
+  nr      = attributes[:nr]      || System.unique_integer()
+  project = attributes[:project] || build(:project)
+
+  %Octotreat.Issue{
+    project: project,
+    url: "#{project.url}/issues/#{nr}",
+    status: "open"
+  } |> struct(attributes)
+end
+```
+
+
+
+
+
+---
+class: center, middle
+
+background-image: url(./octopus_with_gift.png)
+
+
+
+
+
+---
+```elixir
+def changeset(struct, params \\ %{}) do
+  struct
+  |> Octotreat.Repo.preload(:owner)
+  |> cast(params, [:github_id, :url, :name, :stars, :html_url])
+  |> cast_assoc(:owner)
+  |> validate_required([:github_id, :url, :name, :owner])
+  |> assoc_constraint(:owner)
+end
+```
 
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js">
