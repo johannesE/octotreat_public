@@ -6,7 +6,7 @@ The goal is to verify that **the problems exist** and that **they need fixing**.
 ## How to get interviews
 German:
 ```
-Hallo Lukas
+Hallo XXX
     
 Wie geht es dir?
 
@@ -16,7 +16,7 @@ Da du dich auch in dieser Branche bewegst, wäre es interessant mit Dir ein kurz
 Hättest Du Zeit und Lust dafür? Wann könnte ich dich erreichen?
 
 Mit bestem Gruss
-Joe
+XXX
 ```
 
 English:
