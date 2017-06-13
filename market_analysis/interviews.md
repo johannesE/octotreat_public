@@ -1,4 +1,5 @@
 #Interviews with potential clients of all kind
+
 The goal is to verify that **the problems exist** and that **they need fixing**.
 - Problem of the software user: I hate it if my OSS Issues are not adressed / stay open too long.
 - Problem of the contributor: I don't want to always work for free.
@@ -19,9 +20,18 @@ Mit bestem Gruss
 XXX
 ```
 
-English:
+English for repository owners: Subject: **Your experience with the XXX-community**
+Be sure to check first what form of payment they are receiving.
 ```
-TODO
+Hi XXX
+I am a user of XXX and love it. :) Thanks for the great work you put into it.
+Are you developing this at your job? Do you receive any form of payment for it?
+I have thought a lot about the (financial) reward system and the roles necessary to build trust for
+a healthy community around an open source project. I would like to talk to open source developers 
+and people they work with to learn from their problems.
+Would you be interested to tell me about your experiences on skype, appear.in or via email?
+Best regards,
+Joe
 ```
 
 
