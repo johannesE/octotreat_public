@@ -35,7 +35,7 @@ Joe
 ```
 
 
-##How to proceed during the interview?
+##How to proceed during the interview with a software **consumer**?
 - Ask about the clients experience with OSS?
 - Ask **why** he thinks these experiences turned out like this.
 - Keep asking why
@@ -48,3 +48,14 @@ Joe
 
 **If** this is more or less what we have already built, show a small demo and ask them whether we can sign them up for beta users.
 
+##How to proceed during the interview with a software **contributor**?
+- Ask about the clients motivation?
+- Ask about the clients experience with contributions?
+- Ask about the clients experience with money?
+
+**If** this validates that there is a problem that needs fixing, continue:
+- If there was a crowdfunding for each one of your software bugs, would you like that?
+- How would you promote collaboration in such a system?
+- What are the expectations in the system and the process?
+
+**If** this is more or less what we have already built, show a small demo and ask them whether we can sign them up for beta users.
